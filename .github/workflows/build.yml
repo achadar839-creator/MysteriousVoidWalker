@@ -9,17 +9,22 @@ jobs:
   build-android:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.8'
+          python-version: '3.11'
 
-      - name: Install dependencies
+      - name: Install System Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential libltdl-dev libffi-dev libssl-dev python3-dev
+          sudo apt-get install -y build-essential libltdl-dev libffi-dev libssl-dev python3-dev zip unzip git openjdk-17-jdk
+
+      - name: Install Python Dependencies
+        run: |
+          pip install --upgrade pip
           pip install --upgrade buildozer cython virtualenv
 
       - name: Build with Buildozer
@@ -27,7 +32,7 @@ jobs:
           yes | buildozer -v android debug
 
       - name: Upload APK
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: zaifer-app
           path: bin/*.apk
