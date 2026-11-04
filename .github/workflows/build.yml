@@ -32,10 +32,19 @@ jobs:
         sudo apt-get install -y git zip unzip autoconf libtool pkg-config zlib1g-dev \
           libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev
 
-    - name: Accept Android SDK Licenses & Install AIDL Build-Tools
+    - name: Pre-accept Android Licenses & Link SDK to Buildozer
       run: |
-        yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
-        $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "build-tools;34.0.0" "platforms;android-34" "platform-tools"
+        # 1. Licenses pre-approval without prompt
+        mkdir -p "$ANDROID_HOME/licenses"
+        echo -e "\n89337d12077e084b022a1118b24f7d73d692e647\n24333f8a63b6825ea9c5514f83c2829b004d1fee" > "$ANDROID_HOME/licenses/android-sdk-license"
+        echo -e "\n84831b9409646a918e30573bab4c9c91346d8abd\n504667f4c0de7df1a00b9793c4b2734f4da5a7f3" > "$ANDROID_HOME/licenses/android-sdk-preview-license"
+        
+        # 2. Make sure build-tools 34.0.0 is present with AIDL
+        yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_HOME "build-tools;34.0.0" "platforms;android-34" "platform-tools" || true
+        
+        # 3. Symlink system SDK directly to Buildozer's expected path
+        mkdir -p /home/runner/.buildozer/android/platform
+        ln -s "$ANDROID_HOME" /home/runner/.buildozer/android/platform/android-sdk
 
     - name: Install Buildozer & Packaging Tools
       run: |
