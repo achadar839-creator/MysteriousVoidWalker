@@ -3,7 +3,7 @@ title = Zaifer AI
 package.name = zaifer
 package.domain = org.chandan.zaifer
 source.dir = .
-source.include_exts = py,png,jpg,kv,atlas
+source.include_exts = py,png,jpg,kv,atlas,json
 version = 1.0
 
 # Dependencies (Kivy aur requests chahiye)
