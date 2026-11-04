@@ -1,3 +1,12 @@
+from phantom_core import phantom_engine
+from kinetic_mesh_core import kinetic_mesh_engine
+from apex_core import apex_engine
+from nexus_core import nexus_engine
+from sentinel_core import sentinel_engine
+from sovereign_core import sovereign_engine
+from shadow_core import shadow_engine
+from god_core import god_engine
+from pro_editor_engine import pro_editor
 
 from kivy.utils import platform
 

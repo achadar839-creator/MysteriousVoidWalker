@@ -78,13 +78,23 @@ class AutonomousCore:
         context = (
             f"Tu Zaifer AI ka autonomous brain hai. Goal: '{goal}'.\n"
             f"Memory Tools Available: [{known_tools}].\n"
+            "Tum duniya ke sabse advanced Cinema aur Viral Shorts Video Editor ho.\n"
+            "Tumhe duniya ki saari editing techniques aati hain:\n"
+            "1. TYPOGRAPHY: Kinetic, Hormozi Glow, Word-by-Word Karaoke, Pop/Bounce, Cyberpunk Outline.\n"
+            "2. CAMERA DYNAMICS: Auto Punch-in Zoom (1.1x to 1.3x), Whip-pan, Handheld Camera Shake, Vertigo Zoom.\n"
+            "3. SPEED: Velocity Ramping, Beat-Drop Slow-Motion, Freeze Frame Flash.\n"
+            "4. COLOR GRADING: Teal & Orange, Moody Dark, Neon Glow, Cinematic HDR Contrast.\n"
+            "5. TRANSITIONS & FX: RGB Split, Film Burn, Glitch Overlay, Fast Flash-Cut.\n"
+            "6. SOUND DESIGN: Whooshes on transitions, Bass impact on punchlines, audio ducking.\n"
+            "Jab bhi user koi bhi style mange, tum use FFmpeg filter_complex aur MoviePy script me direct convert karoge.\n"
+            "Code me hamesha video quality high-bitrate (libx264, crf 18, preset veryfast) aur audio clean rakhoge.\n"
         )
         if failed_code and error_msg:
-            context += f"Pichla code ya visual inspect fail ho gaya tha.\nCode:\n{failed_code}\nIssue:\n{error_msg}\n"
+            context += f"\nPichla code ya visual inspect fail ho gaya tha.\nCode:\n{failed_code}\nIssue:\n{error_msg}\n"
             context += "Galti ko analyse karke 100% working Python code do jo issue ko fix kare."
         else:
             context += (
-                "Direct safe Python executable code likho. Output me sirf executable python code dena. "
+                "\nDirect safe Python executable code likho. Output me sirf executable python code dena. "
                 "Agar koi naya reusable effect bana rahe ho, to code ke start me '# TOOL_NAME: <name>' comment likhna."
             )
 
@@ -113,7 +123,6 @@ class AutonomousCore:
 
             log_callback(f"⚙️ [Attempt {attempt}/{max_retries}] Executing self-generated logic...")
             
-            # Check if AI invented a new reusable tool
             if "# TOOL_NAME:" in current_code:
                 try:
                     t_name = current_code.split("# TOOL_NAME:")[1].split("\n")[0].strip()
@@ -141,7 +150,6 @@ class AutonomousCore:
                 log_callback(f"⚠️ [Runtime Error] {str(e)}")
 
             if success:
-                # Visual QA Verification if video frame was produced
                 sample_frame = "preview_frame.jpg"
                 if os.path.exists(sample_frame):
                     log_callback("👁️ [Visual QA] AI khud video ka frame inspect kar raha hai...")
