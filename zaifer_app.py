@@ -2,12 +2,18 @@ import os
 import time
 import threading
 import requests
+import yt_dlp
 from kivy.app import App
 from kivy.lang import Builder
 from kivy.uix.boxlayout import BoxLayout
 from kivy.properties import StringProperty, BooleanProperty
 from kivy.core.window import Window
 from kivy.clock import mainthread
+try:
+    from plyer import filechooser, stt
+    HAS_PLYER = True
+except ImportError:
+    HAS_PLYER = False
 
 Window.clearcolor = (0.06, 0.10, 0.14, 1)
 
@@ -93,6 +99,13 @@ BoxLayout:
                 pos: self.pos
                 size: self.size
 
+        Button:
+            text: "📁"
+            size_hint_x: None
+            width: "50dp"
+            background_color: (0,0,0,0)
+            on_release: app.pick_gallery_video()
+
         TextInput:
             id: user_input
             hint_text: "YouTube Shorts ka link dalein..."
@@ -116,6 +129,13 @@ BoxLayout:
                     width: 1.2
 
         Button:
+            text: "🎙️"
+            size_hint_x: None
+            width: "50dp"
+            background_color: (0,0,0,0)
+            on_release: app.toggle_voice_record()
+
+        Button:
             text: "SEND"
             size_hint_x: None
             width: "80dp"
@@ -137,6 +157,31 @@ class ChatBubble(BoxLayout):
     is_user = BooleanProperty(False)
 
 class ZaiferApp(App):
+
+    selected_raw_video = StringProperty("")
+
+    def pick_gallery_video(self):
+        if HAS_PLYER:
+            filechooser.open_file(on_selection=self.on_video_selected)
+        else:
+            self.add_msg("📁 Gallery Picker active: Select video.", is_user=False)
+
+    
+    def toggle_voice_record(self):
+        if HAS_PLYER:
+            try:
+                stt.start()
+                self.add_msg("🎙️ Sun raha hoon... Boliye!", is_user=False)
+            except Exception as e:
+                self.add_msg(f"Mic error: {str(e)}", is_user=False)
+        else:
+            self.add_msg("🎙️ Voice Engine active: Keyboard mic se bol kar type kar sakte hain.", is_user=False)
+
+    def on_video_selected(self, selection):
+        if selection:
+            self.selected_raw_video = selection[0]
+            self.add_msg(f"🎬 Video Selected: {selection[0]}", is_user=False)
+
     def build(self):
         return Builder.load_string(KV)
         
@@ -161,12 +206,27 @@ class ZaiferApp(App):
         chat_list.add_widget(ChatBubble(text=text, is_user=is_user))
         self.root.ids.scroll_view.scroll_y = 0
 
+    def download_video_native(self, link):
+        ydl_opts = {
+            "format": "best[ext=mp4]/best",
+            "outtmpl": TUTORIAL_VIDEO,
+            "quiet": True,
+            "no_warnings": True
+        }
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            ydl.download([link])
+
     def process_video_ai(self, link):
         self.add_msg("⏳ [color=#00ccff][1/4] Video download ho rahi hai...[/color]", is_user=False)
         if os.path.exists(TUTORIAL_VIDEO):
             os.remove(TUTORIAL_VIDEO)
-        os.system(f"yt-dlp -f "bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4]/best" -o "{TUTORIAL_VIDEO}" "{link}" --quiet --no-warnings")
         
+        try:
+            self.download_video_native(link)
+        except Exception as e:
+            self.add_msg(f"[color=#ff4444]❌ Download Error: {str(e)}[/color]", is_user=False)
+            return
+
         if not os.path.exists(TUTORIAL_VIDEO):
             self.add_msg("[color=#ff4444]❌ Video download fail ho gayi.[/color]", is_user=False)
             return
