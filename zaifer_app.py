@@ -1,3 +1,22 @@
+
+from kivy.utils import platform
+
+def request_android_permissions():
+    if platform == "android":
+        try:
+            from android.permissions import request_permissions, Permission
+            request_permissions([
+                Permission.INTERNET,
+                Permission.RECORD_AUDIO,
+                Permission.READ_MEDIA_VIDEO,
+                Permission.READ_EXTERNAL_STORAGE,
+                Permission.WRITE_EXTERNAL_STORAGE
+            ])
+        except Exception:
+            pass
+
+from voice_engine import speak_zaifer
+from autonomous_core import AutonomousCore
 import os
 import time
 import threading
@@ -157,6 +176,7 @@ class ChatBubble(BoxLayout):
     is_user = BooleanProperty(False)
 
 class ZaiferApp(App):
+    auto_core = None
 
     selected_raw_video = StringProperty("")
 
@@ -186,6 +206,8 @@ class ZaiferApp(App):
         return Builder.load_string(KV)
         
     def on_start(self):
+        request_android_permissions()
+        self.auto_core = AutonomousCore()
         welcome_msg = "Mysterious Void Walker Engine Online.\nYouTube Shorts ka link paste karein, AI uske subtitles aur animations clone karega."
         self.add_msg(welcome_msg, is_user=False)
 
@@ -205,6 +227,8 @@ class ZaiferApp(App):
         chat_list = self.root.ids.chat_list
         chat_list.add_widget(ChatBubble(text=text, is_user=is_user))
         self.root.ids.scroll_view.scroll_y = 0
+        if not is_user:
+            speak_zaifer(text)
 
     def download_video_native(self, link):
         ydl_opts = {
