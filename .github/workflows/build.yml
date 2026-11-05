@@ -2,7 +2,7 @@ name: Build Android APK
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, master ]
   workflow_dispatch:
 
 jobs:
@@ -12,8 +12,6 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-        with:
-          submodules: recursive
 
       - name: Set up Python 3.11
         uses: actions/setup-python@v5
@@ -25,22 +23,19 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y git zip unzip openjdk-17-jdk autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev
 
-      - name: Install Stable Buildozer, P4A, and Pip
+      - name: Setup Stable Buildozer & Tools
         run: |
-          python3 -m pip install --upgrade pip==24.0
+          python3 -m pip install --upgrade "pip<24.1"
           pip install --upgrade "cython<3.0"
           pip install --upgrade buildozer
           pip install --upgrade git+https://github.com/kivy/python-for-android.git@master
 
-      - name: Accept Android Licenses
-        run: |
-          yes | sdkmanager --licenses || true
-
       - name: Build with Buildozer
         run: |
+          yes | sdkmanager --licenses || true
           buildozer android debug
 
-      - name: Upload APK Artifact
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: app-debug

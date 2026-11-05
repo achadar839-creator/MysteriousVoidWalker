@@ -7,7 +7,7 @@ source.include_exts = py,png,jpg,kv,atlas,json
 version = 1.0
 
 # Dependencies (Kivy aur requests chahiye)
-requirements = python3,kivy,plyer,requests,urllib3,certifi,yt-dlp
+requirements = python3,kivy
 
 # Android Settings
 orientation = portrait
