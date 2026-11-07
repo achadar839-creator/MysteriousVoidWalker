@@ -45,8 +45,12 @@ jobs:
             find "$HOME/.buildozer/android" -maxdepth 5 -type f -name sdkmanager
             exit 1
           fi
-          yes | "$SDKMANAGER" --licenses
-          yes | "$SDKMANAGER" "build-tools;37.0.0" "platform-tools"
+          set +e; set +o pipefail
+          yes | "$SDKMANAGER" --licenses || true
+          set -e; set -o pipefail
+          set +e; set +o pipefail
+          yes | "$SDKMANAGER" "build-tools;37.0.0" "platform-tools" || true
+          set -e; set -o pipefail
           test -x "$SDK_ROOT/build-tools/37.0.0/aidl"
 
       - name: Build APK
