@@ -1,0 +1,16 @@
+.venv/
+.venv11/
+bin/
+build/
+.buildozer/
+*.wav
+*.mp3
+__pycache__/
+
+# Large local models and generated media
+*.gguf
+*.onnx
+*.mp4
+piper_linux_aarch64.tar.gz
+whisper.cpp/.git/
+whisper.cpp/
