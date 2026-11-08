@@ -8,54 +8,53 @@ jobs:
   build:
     runs-on: ubuntu-22.04
     steps:
-      - name: Checkout Code
+      - name: "Checkout Code"
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: "Set up Python"
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: '3.11'
 
-      - name: Set up Java
+      - name: "Set up Java"
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: "17"
+          java-version: '17'
 
-      - name: Install System Dependencies
+      - name: "Install System Dependencies"
         run: |
           sudo apt-get update
           sudo apt-get install -y git zip unzip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev cmake libffi-dev libssl-dev
 
-      - name: Install Build Tools
+      - name: "Install Build Tools"
         run: |
           python -m pip install --upgrade "pip<24.1"
           python -m pip install "cython<3.0" buildozer
           python -m pip install git+https://github.com/kivy/python-for-android.git@master
 
-      - name: Init Buildozer
+      - name: "Init Buildozer"
         run: |
           if [ ! -f "buildozer.spec" ]; then yes | buildozer init; fi
 
-      - name: 🚨 SECRET WEAPON: Auto-Inject Licenses 🚨
+      - name: "Auto-Inject Android SDK Licenses"
         run: |
-          echo "Injecting Android License Signatures directly into server brain..."
+          echo "Injecting Android License Signatures..."
           export ANDROID_HOME="$HOME/.buildozer/android/platform/android-sdk"
           mkdir -p "$ANDROID_HOME/licenses"
           
-          # Android ke universal accepted license hashes seedha file me likh rahe hain
           echo "24333f8a63b6825ea9c5514f83c2829b004d1fee" > "$ANDROID_HOME/licenses/android-sdk-license"
           echo "8933bad161af4178b1185d1a37fbf41ea5269c55" >> "$ANDROID_HOME/licenses/android-sdk-license"
           echo "d56f5187479451eabf01fb78af6dfcb131a6481e" >> "$ANDROID_HOME/licenses/android-sdk-license"
           echo "84831b9409646a918e30573bab4c9c91346d8abd" > "$ANDROID_HOME/licenses/android-sdk-preview-license"
           
-          echo "Licenses Injected Successfully! Ab koi prompt (y/N) nahi aayega!"
+          echo "Licenses Injected Successfully!"
 
-      - name: 🚀 FINAL BUILD APK 🚀
+      - name: "FINAL BUILD APK"
         run: |
           yes | buildozer android debug
 
-      - name: Upload APK
+      - name: "Upload APK"
         uses: actions/upload-artifact@v4
         with:
           name: VoidWalker-Android-APK
