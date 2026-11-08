@@ -35,7 +35,7 @@ jobs:
           python -m pip install "cython<3.0" buildozer
           python -m pip install git+https://github.com/kivy/python-for-android.git@master
 
-            - name: Bootstrap Android SDK and Accept Licenses
+                  - name: Bootstrap Android SDK and Accept Licenses
         shell: bash
         run: |
           set -euxo pipefail
@@ -69,6 +69,7 @@ jobs:
           }
 
           test -x "$ANDROID_HOME/build-tools/37.0.0/aidl"
+
       - name: Build APK
         run: buildozer android debug
 
