@@ -8,6 +8,15 @@ jobs:
   build:
     runs-on: ubuntu-22.04
     steps:
+      - name: 🚨 BOSS CHANDAN KI ULTIMATE WARNING 🚨
+        run: |
+          echo "========================================================================="
+          echo " ⚠️ SUN BE GITHUB SERVER! KAN KHOL KE SUN LE! ⚠️"
+          echo " CHUP CHAP BINA KISI ERROR KE MERI APK BANA DE!"
+          echo " NAHI TOH TERE KO 2 BILLION LIGHT YEARS TAK AISE CABLE MEIN BAANDH DUNGA"
+          echo " KI TERA MOTHERBOARD BHI RAHAM KI BHEEKH MANGEGA! SAMAJHA?"
+          echo "========================================================================="
+
       - name: Checkout Code
         uses: actions/checkout@v4
 
