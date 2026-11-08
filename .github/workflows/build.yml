@@ -33,14 +33,28 @@ jobs:
           python -m pip install "cython<3.0" buildozer
           python -m pip install git+https://github.com/kivy/python-for-android.git@master
 
-      - name: Accept Android SDK License (Official Kivy Method)
+      - name: Fix API Versions in buildozer.spec
         run: |
           if [ ! -f "buildozer.spec" ]; then yes | buildozer init; fi
-          # Kivy ka official tareeka: File me hi license bypass on kar do
-          sed -i.bak "s/^#* *android.accept_sdk_license = .*/android.accept_sdk_license = True/" buildozer.spec
-          echo "android.accept_sdk_license = True" >> buildozer.spec
+          # API 37 ko forcefully hata kar stable API 34 aur Build-tools 34 set kar rahe hain
+          sed -i.bak "s/^#* *android.api = .*/android.api = 34/" buildozer.spec
+          sed -i.bak "s/^#* *android.build_tools_version = .*/android.build_tools_version = 34.0.0/" buildozer.spec
 
-      - name: Build APK
+      - name: Setup SDK and Accept Licenses DIRECTLY
+        run: |
+          # 1. Pehle Buildozer run karo taaki wo SDK download kare. License par use fail hone do (|| true lagaya hai taaki workflow na ruke)
+          buildozer android debug || echo "SDK Downloaded. Proceeding to manual license acceptance..."
+          
+          # 2. Ab us downloaded sdkmanager ko dhundho
+          SDKMANAGER=$(find ~/.buildozer/android/platform/android-sdk -name sdkmanager -type f -executable | head -n 1)
+          echo "Found sdkmanager at: $SDKMANAGER"
+          
+          # 3. GitHub ki broken pipe wali security temporary band karke sidha license accept karo
+          set +eo pipefail
+          yes | "$SDKMANAGER" --licenses
+          set -eo pipefail
+
+      - name: Final APK Build
         run: buildozer android debug
 
       - name: Upload Artifact
