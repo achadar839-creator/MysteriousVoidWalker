@@ -36,31 +36,32 @@ jobs:
       - name: Bootstrap Android SDK and Accept Licenses
         shell: bash
         run: |
-          set -euxo pipefail
+          set -ex
           export ANDROID_HOME="$HOME/.buildozer/android/platform/android-sdk"
           export ANDROID_SDK_ROOT="$ANDROID_HOME"
           
-          buildozer android debug || true
+          echo "=== 1. Starting Buildozer Initial Setup ==="
+          # Yahan || true rakha hai taaki buildozer ka initial run fail hone par script na ruke, lekin output dikhega
+          buildozer android debug || echo "Buildozer initial run failed (Expected if SDK is missing), moving to manual setup..."
           
           if [ ! -d "$ANDROID_HOME" ]; then
-            echo "Android SDK directory was not created by buildozer."
+            echo "ERROR: Android SDK directory was not created!"
             exit 1
           fi
           
           SDKMANAGER_PATH="$(find "$ANDROID_HOME" -type f -name sdkmanager | head -n 1)"
-          if [ -z "$SDKMANAGER_PATH" ]; then
-            echo "sdkmanager not found under $ANDROID_HOME"
-            find "$HOME/.buildozer/android" -maxdepth 5 -type f -name sdkmanager || true
-            exit 1
-          fi
+          echo "=== Found sdkmanager at: $SDKMANAGER_PATH ==="
           
-          echo "Using sdkmanager: $SDKMANAGER_PATH"
-          yes | "$SDKMANAGER_PATH" --licenses >/dev/null 2>&1 || true
+          echo "=== 2. Accepting Licenses (Pura Output Dikhega) ==="
+          set +e
+          yes | "$SDKMANAGER_PATH" --licenses
+          set -e
           
-          "$SDKMANAGER_PATH" "platform-tools" "build-tools;37.0.0" "platforms;android-33" "platforms;android-34" >/dev/null 2>&1 || {
-            echo "SDK package installation failed"
-            exit 1
-          }
+          echo "=== 3. Installing SDK Packages (Asli Error Yahan Dikhega) ==="
+          # Yahan se >/dev/null hata diya hai taaki error log mein aaye
+          "$SDKMANAGER_PATH" "platform-tools" "build-tools;37.0.0" "platforms;android-33" "platforms;android-34"
+          
+          echo "=== 4. Verifying Installation ==="
           test -x "$ANDROID_HOME/build-tools/37.0.0/aidl"
 
       - name: Build APK
