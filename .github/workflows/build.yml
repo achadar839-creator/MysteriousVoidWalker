@@ -8,15 +8,6 @@ jobs:
   build:
     runs-on: ubuntu-22.04
     steps:
-      - name: 🚨 BOSS CHANDAN KI ULTIMATE WARNING 🚨
-        run: |
-          echo "========================================================================="
-          echo " ⚠️ SUN BE GITHUB SERVER! KAN KHOL KE SUN LE! ⚠️"
-          echo " CHUP CHAP BINA KISI ERROR KE MERI APK BANA DE!"
-          echo " NAHI TOH TERE KO 2 BILLION LIGHT YEARS TAK AISE CABLE MEIN BAANDH DUNGA"
-          echo " KI TERA MOTHERBOARD BHI RAHAM KI BHEEKH MANGEGA! SAMAJHA?"
-          echo "========================================================================="
-
       - name: Checkout Code
         uses: actions/checkout@v4
 
@@ -42,35 +33,27 @@ jobs:
           python -m pip install "cython<3.0" buildozer
           python -m pip install git+https://github.com/kivy/python-for-android.git@master
 
-      - name: Initialize Buildozer (If missing)
+      - name: Init Buildozer
         run: |
-          if [ ! -f "buildozer.spec" ]; then
-            echo "buildozer.spec nahi mila, naya bana raha hu..."
-            yes | buildozer init
-          fi
+          if [ ! -f "buildozer.spec" ]; then yes | buildozer init; fi
 
-      - name: Accept Licenses & Install SDK
+      - name: 🚨 SECRET WEAPON: Auto-Inject Licenses 🚨
         run: |
-          # Pehla run taaki Buildozer SDK download kar le
-          buildozer android debug || echo "Buildozer SDK setup complete."
+          echo "Injecting Android License Signatures directly into server brain..."
+          export ANDROID_HOME="$HOME/.buildozer/android/platform/android-sdk"
+          mkdir -p "$ANDROID_HOME/licenses"
           
-          # Sdkmanager dhundhna
-          SDKMANAGER_PATH=$(find "$HOME/.buildozer/android" -type f -name sdkmanager | head -n 1)
-          if [ -z "$SDKMANAGER_PATH" ]; then
-            echo "Error: sdkmanager nahi mila!"
-            exit 1
-          fi
+          # Android ke universal accepted license hashes seedha file me likh rahe hain
+          echo "24333f8a63b6825ea9c5514f83c2829b004d1fee" > "$ANDROID_HOME/licenses/android-sdk-license"
+          echo "8933bad161af4178b1185d1a37fbf41ea5269c55" >> "$ANDROID_HOME/licenses/android-sdk-license"
+          echo "d56f5187479451eabf01fb78af6dfcb131a6481e" >> "$ANDROID_HOME/licenses/android-sdk-license"
+          echo "84831b9409646a918e30573bab4c9c91346d8abd" > "$ANDROID_HOME/licenses/android-sdk-preview-license"
           
-          # Licenses accept karna (Bina pipefail ke)
-          echo "Accepting licenses..."
-          yes | "$SDKMANAGER_PATH" --licenses || true
-          
-          # Sahi API (34.0.0) install karna, Fake 37.0.0 nahi
-          echo "Installing build-tools 34.0.0..."
-          "$SDKMANAGER_PATH" "platform-tools" "build-tools;34.0.0" "platforms;android-34" || true
+          echo "Licenses Injected Successfully! Ab koi prompt (y/N) nahi aayega!"
 
-      - name: Final Build APK
-        run: buildozer android debug
+      - name: 🚀 FINAL BUILD APK 🚀
+        run: |
+          yes | buildozer android debug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
